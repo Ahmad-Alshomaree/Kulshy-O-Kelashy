@@ -134,25 +134,6 @@ export default function CheckoutPage() {
                       </Select>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="zip">ZIP Code</Label>
-                      <Input id="zip" placeholder="10001" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country</Label>
-                      <Select defaultValue="us">
-                        <SelectTrigger id="country">
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="us">United States</SelectItem>
-                          <SelectItem value="ca">Canada</SelectItem>
-                          <SelectItem value="uk">United Kingdom</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -182,7 +163,7 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between">
                 <Link href="/cart">
-                  <Button variant="outline">Back to Cart</Button>
+                  <Button variant="outline">Back to Basket</Button>
                 </Link>
                 <Button onClick={() => setStep(2)}>Continue to Payment</Button>
               </div>
@@ -269,25 +250,6 @@ export default function CheckoutPage() {
                           <SelectItem value="ca">California</SelectItem>
                           <SelectItem value="tx">Texas</SelectItem>
                           <SelectItem value="fl">Florida</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="billing-zip">ZIP Code</Label>
-                      <Input id="billing-zip" placeholder="10001" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="billing-country">Country</Label>
-                      <Select defaultValue="us">
-                        <SelectTrigger id="billing-country">
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="us">United States</SelectItem>
-                          <SelectItem value="ca">Canada</SelectItem>
-                          <SelectItem value="uk">United Kingdom</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

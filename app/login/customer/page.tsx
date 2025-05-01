@@ -1,16 +1,39 @@
 "use client"
 
+import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { Eye, EyeOff } from "lucide-react"
-
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function CustomerLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const router = useRouter()
+  const { login } = useAuth()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setIsLoading(true)
+
+    try {
+      await login(email, password)
+      router.push("/") // Redirect to home page after login
+    } catch (err) {
+      setError("Failed to login. Please check your credentials.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-palette-cream/30 flex flex-col">
@@ -24,7 +47,11 @@ export default function CustomerLoginPage() {
             <p className="mt-2 text-palette-darkGreen/70">Enter your details below</p>
           </div>
 
-          <form className="mt-8 space-y-6">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">{error}</div>
+          )}
+
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="email" className="text-palette-darkGreen">
@@ -36,6 +63,8 @@ export default function CustomerLoginPage() {
                   placeholder="Enter your email"
                   className="mt-1 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -50,6 +79,8 @@ export default function CustomerLoginPage() {
                     placeholder="Enter your password"
                     className="pr-10 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
                     type="button"
@@ -74,8 +105,12 @@ export default function CustomerLoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-palette-darkGreen hover:bg-palette-olive text-white py-6">
-              Sign In
+            <Button
+              type="submit"
+              className="w-full bg-palette-darkGreen hover:bg-palette-olive text-white py-6"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
 
             <div className="text-center">

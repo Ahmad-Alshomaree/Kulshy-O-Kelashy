@@ -16,7 +16,7 @@ export default function LoginPage() {
             <h2 className="text-2xl mb-8 text-palette-cream">Create Account</h2>
 
             <div className="w-full space-y-6">
-              <p className="text-center text-xl mb-4">Log in as:</p>
+              <p className="text-center text-xl mb-4">Sign up as:</p>
 
               <Link href="/login/customer" className="block w-full">
                 <Button

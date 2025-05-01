@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
-
 import { ProductCard } from "@/components/product-card"
 import { StaggerContainer, StaggerItem, ScrollAnimation } from "@/components/motion"
 

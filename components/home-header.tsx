@@ -1,17 +1,20 @@
 "use client"
 
 import Link from "next/link"
-import { Heart, Search, ShoppingCart } from "lucide-react"
+import { Heart, Search, ShoppingCart, User, Bell } from "lucide-react"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
-
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CategoryNav } from "@/components/category-nav"
 import { HoverButton } from "@/components/motion"
+import { useAuth } from "@/contexts/auth-context"
 
 export function HomeHeader() {
   const [isClient, setIsClient] = useState(false)
+  const { user, logout } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     setIsClient(true)
@@ -108,20 +111,44 @@ export function HomeHeader() {
                   </Button>
                 </motion.div>
               </Link>
-              <Link href="/login">
-                <HoverButton>
-                  <Button size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10">
-                    Sign in
-                  </Button>
-                </HoverButton>
-              </Link>
-              <Link href="/signup">
-                <HoverButton>
-                  <Button size="sm" className="bg-palette-cream text-palette-darkGreen hover:bg-white">
-                    Sign up
-                  </Button>
-                </HoverButton>
-              </Link>
+
+              {user ? (
+                // Show Account and Settings icons when logged in
+                <>
+                  <Link href="/account">
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                      <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                        <User className="h-5 w-5" />
+                      </Button>
+                    </motion.div>
+                  </Link>
+                  <Link href="/notifications">
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                      <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                        <Bell className="h-5 w-5" />
+                      </Button>
+                    </motion.div>
+                  </Link>
+                </>
+              ) : (
+                // Show Sign in and Sign up buttons when logged out
+                <>
+                  <Link href="/login">
+                    <HoverButton>
+                      <Button size="sm" className="bg-palette-cream text-palette-darkGreen hover:bg-white">
+                        Sign in
+                      </Button>
+                    </HoverButton>
+                  </Link>
+                  <Link href="/signup">
+                    <HoverButton>
+                      <Button size="sm" className="bg-palette-cream text-palette-darkGreen hover:bg-white">
+                        Sign up
+                      </Button>
+                    </HoverButton>
+                  </Link>
+                </>
+              )}
             </motion.div>
           ) : (
             <div className="flex items-center gap-4">
@@ -138,16 +165,36 @@ export function HomeHeader() {
                   </span>
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10">
-                  Sign in
-                </Button>
-              </Link>
-              <Link href="/signup">
-                <Button size="sm" className="bg-palette-cream text-palette-darkGreen hover:bg-white">
-                  Sign up
-                </Button>
-              </Link>
+
+              {user ? (
+                // Show Account and Settings icons when logged out
+                <>
+                  <Link href="/account">
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href="/notifications">
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                      <Bell className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                // Show Sign in and Sign up buttons when logged out
+                <>
+                  <Link href="/login">
+                    <Button size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                      Sign in
+                    </Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button size="sm" className="bg-palette-cream text-palette-darkGreen hover:bg-white">
+                      Sign up
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </div>

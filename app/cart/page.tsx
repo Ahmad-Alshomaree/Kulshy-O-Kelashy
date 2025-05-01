@@ -3,7 +3,6 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Trash2 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -46,11 +45,11 @@ export default function CartPage() {
 
   return (
     <div className="container px-4 md:px-6 py-6 md:py-10">
-      <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
+      <h1 className="text-3xl font-bold mb-6">Your Basket</h1>
       {cartItems.length === 0 ? (
         <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold mb-4">Your cart is empty</h2>
-          <p className="text-muted-foreground mb-6">Looks like you haven&apos;t added any products to your cart yet.</p>
+          <h2 className="text-2xl font-semibold mb-4">Your basket is empty</h2>
+          <p className="text-muted-foreground mb-6">Looks like you haven&apos;t added any products to your basket yet.</p>
           <Link href="/products">
             <Button>Continue Shopping</Button>
           </Link>
