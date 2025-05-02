@@ -5,7 +5,6 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Bell, Shield, Moon, Sun, Globe, CreditCard, ChevronRight } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -20,11 +19,6 @@ export default function SettingsPage() {
   const [notifications, setNotifications] = useState(true)
 
   // Redirect if not logged in
-  useEffect(() => {
-    if (!user) {
-      router.push("/login")
-    }
-  }, [user, router])
 
   if (!user) {
     return null // Don't render anything while redirecting
@@ -35,10 +29,9 @@ export default function SettingsPage() {
       title: "Account",
       items: [
         { icon: Shield, label: "Privacy & Security", href: "/settings/privacy" },
-        { icon: CreditCard, label: "Payment Methods", href: "/settings/payment" },
         { icon: Globe, label: "Language", href: "/settings/language" },
       ],
-    },
+    }, // Add more sections as needed.
     {
       title: "Preferences",
       items: [

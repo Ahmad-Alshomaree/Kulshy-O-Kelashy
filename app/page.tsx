@@ -1,3 +1,4 @@
+import { Newsletter } from "@/components/newsletter"
 import { PageTransitionWrapper } from "@/components/page-transition-wrapper"
 import { HomeHero } from "@/components/home-hero"
 import { HomeProductSection } from "@/components/home-product-section"
@@ -18,6 +19,7 @@ export default function Home() {
       isNew: false,
       isSale: true,
       discount: "-15%",
+      viewCount: 320,
     },
     {
       id: 2,
@@ -30,6 +32,7 @@ export default function Home() {
       isNew: true,
       isSale: false,
       discount: null,
+      viewCount: 280,
     },
     {
       id: 3,
@@ -42,6 +45,7 @@ export default function Home() {
       isNew: false,
       isSale: true,
       discount: "-15%",
+      viewCount: 450,
     },
     {
       id: 4,
@@ -54,6 +58,7 @@ export default function Home() {
       isNew: false,
       isSale: false,
       discount: null,
+      viewCount: 180,
     },
   ]
 
@@ -69,6 +74,7 @@ export default function Home() {
       isNew: false,
       isSale: true,
       discount: "-25%",
+      viewCount: 310,
     },
     {
       id: 6,
@@ -81,6 +87,7 @@ export default function Home() {
       isNew: false,
       isSale: true,
       discount: "-20%",
+      viewCount: 290,
     },
     {
       id: 7,
@@ -93,6 +100,7 @@ export default function Home() {
       isNew: false,
       isSale: true,
       discount: "-20%",
+      viewCount: 420,
     },
     {
       id: 8,
@@ -105,6 +113,7 @@ export default function Home() {
       isNew: false,
       isSale: true,
       discount: "-25%",
+      viewCount: 170,
     },
   ]
 
@@ -120,6 +129,7 @@ export default function Home() {
       isNew: false,
       isSale: true,
       discount: "-15%",
+      viewCount: 520,
     },
     {
       id: 10,
@@ -132,6 +142,7 @@ export default function Home() {
       isNew: false,
       isSale: false,
       discount: null,
+      viewCount: 480,
     },
     {
       id: 11,
@@ -144,6 +155,7 @@ export default function Home() {
       isNew: false,
       isSale: true,
       discount: "-15%",
+      viewCount: 650,
     },
     {
       id: 12,
@@ -156,6 +168,7 @@ export default function Home() {
       isNew: false,
       isSale: false,
       discount: null,
+      viewCount: 510,
     },
   ]
 
@@ -169,13 +182,21 @@ export default function Home() {
           <HomeHero />
 
           {/* High-Rated Items */}
-          <HomeProductSection title="High-Rated Items" products={highRatedProducts} />
+          <HomeProductSection title="High-Rated Items" products={highRatedProducts} featureType="high-rated" />
 
           {/* Offers */}
-          <HomeProductSection title="Offers" products={offerProducts} className="bg-palette-taupe/10" />
+          <HomeProductSection
+            title="Offers"
+            products={offerProducts}
+            className="bg-palette-taupe/10"
+            featureType="offers"
+          />
 
           {/* Most Viewed */}
-          <HomeProductSection title="Most Viewed" products={mostViewedProducts} />
+          <HomeProductSection title="Most Viewed" products={mostViewedProducts} featureType="most-viewed" />
+
+          {/* Newsletter */}
+          <Newsletter />
         </main>
 
         <HomeFooter />

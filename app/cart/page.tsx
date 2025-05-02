@@ -160,13 +160,6 @@ export default function CartPage() {
                 <div className="text-center text-sm text-muted-foreground">Secure checkout powered by Stripe</div>
               </div>
             </div>
-            <div className="mt-6 rounded-lg border p-6">
-              <h3 className="font-semibold mb-4">Have a coupon?</h3>
-              <div className="flex gap-2">
-                <Input placeholder="Enter coupon code" />
-                <Button variant="outline">Apply</Button>
-              </div>
-            </div>
           </div>
         </div>
       )}

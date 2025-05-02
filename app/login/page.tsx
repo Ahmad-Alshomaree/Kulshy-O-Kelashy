@@ -53,32 +53,6 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <h3 className="font-bold text-lg mb-4">Account</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/account" className="text-white/70 hover:text-palette-cream">
-                    My Account
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/cart" className="text-white/70 hover:text-palette-cream">
-                    Basket
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/Favorate" className="text-white/70 hover:text-palette-cream">
-                    Favorate
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/shop" className="text-white/70 hover:text-palette-cream">
-                    Shop
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
               <h3 className="font-bold text-lg mb-4">Quick Link</h3>
               <ul className="space-y-2">
                 <li>
@@ -96,38 +70,12 @@ export default function LoginPage() {
                     FAQ
                   </Link>
                 </li>
-                <li>
-                  <Link href="/contact" className="text-white/70 hover:text-palette-cream">
-                    Contact
-                  </Link>
-                </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-bold text-lg mb-4">Download App</h3>
-              <p className="text-white/70 mb-2">Save $3 with App New User Only</p>
               <div className="flex flex-col space-y-2">
                 <div className="flex space-x-2">
-                  <div className="bg-white/10 p-2 rounded-md">
-                    <img src="/placeholder.svg?height=80&width=80&text=QR+Code" alt="QR Code" className="h-20 w-20" />
-                  </div>
-                  <div className="flex flex-col space-y-2">
-                    <Link href="#" className="block">
-                      <img
-                        src="/placeholder.svg?height=40&width=120&text=Google+Play"
-                        alt="Get it on Google Play"
-                        className="h-10"
-                      />
-                    </Link>
-                    <Link href="#" className="block">
-                      <img
-                        src="/placeholder.svg?height=40&width=120&text=App+Store"
-                        alt="Download on App Store"
-                        className="h-10"
-                      />
-                    </Link>
-                  </div>
                 </div>
                 <div className="flex space-x-4 mt-4">
                   <Link href="#" className="text-white/70 hover:text-white">

@@ -1,10 +1,8 @@
 "use client"
-
-import { useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { User, Settings, ShoppingBag, Heart, CreditCard, LogOut, ChevronRight } from "lucide-react"
+import { User, Settings, ShoppingBag, Heart, CreditCard, LogOut, ChevronRight, Bell, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { useAuth } from "@/contexts/auth-context"
 import { PageTransitionWrapper } from "@/components/page-transition-wrapper"
@@ -12,13 +10,6 @@ import { PageTransitionWrapper } from "@/components/page-transition-wrapper"
 export default function AccountPage() {
   const { user, logout } = useAuth()
   const router = useRouter()
-
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!user) {
-      router.push("/login")
-    }
-  }, [user, router])
 
   if (!user) {
     return null // Don't render anything while redirecting
@@ -32,7 +23,9 @@ export default function AccountPage() {
   const menuItems = [
     { icon: User, label: "Personal Information", href: "/account/personal-info" },
     { icon: ShoppingBag, label: "My Orders", href: "/account/orders" },
-    { icon: Heart, label: "Wishlist", href: "/wishlist" },
+    { icon: Heart, label: "Favorate", href: "/wishlist" },
+    { icon: Bell, label: "Notifications", href: "/account/notifications" },
+    { icon: MapPin, label: "Address Information", href: "/account/addresses" },
     { icon: CreditCard, label: "Payment Methods", href: "/account/payment" },
     { icon: Settings, label: "Account Settings", href: "/settings" },
   ]

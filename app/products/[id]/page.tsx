@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Heart, Share, ShoppingCart, Star } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
