@@ -1,14 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Bell, Shield, Moon, Sun, Globe, CreditCard, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { useAuth } from "@/contexts/auth-context"
 import { PageTransitionWrapper } from "@/components/page-transition-wrapper"
 
@@ -29,35 +27,22 @@ export default function SettingsPage() {
       title: "Account",
       items: [
         { icon: Shield, label: "Privacy & Security", href: "/settings/privacy" },
+        { icon: CreditCard, label: "Payment Methods", href: "/settings/payment" },
         { icon: Globe, label: "Language", href: "/settings/language" },
       ],
-    }, // Add more sections as needed.
+    },
     {
       title: "Preferences",
       items: [
         {
           icon: Bell,
           label: "Notifications",
-          component: (
-            <div className="flex items-center space-x-2">
-              <Switch id="notifications" checked={notifications} onCheckedChange={setNotifications} />
-              <Label htmlFor="notifications" className="sr-only">
-                Notifications
-              </Label>
-            </div>
-          ),
+          href: "/settings/notifications",
         },
         {
           icon: darkMode ? Moon : Sun,
-          label: "Dark Mode",
-          component: (
-            <div className="flex items-center space-x-2">
-              <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} />
-              <Label htmlFor="dark-mode" className="sr-only">
-                Dark Mode
-              </Label>
-            </div>
-          ),
+          label: "Appearance",
+          href: "/settings/appearance",
         },
       ],
     },

@@ -1,21 +1,20 @@
 "use client"
 
 import type React from "react"
-import { AnimatePresence } from "framer-motion"
 
-import { ThemeProvider } from "@/components/theme-provider"
-import { PageTransition } from "@/components/motion"
+import { CartProvider } from "@/contexts/cart-context"
+import { WishlistProvider } from "@/contexts/wishlist-context"
+import { AuthProvider } from "@/contexts/auth-context"
+import { SellerAuthProvider } from "@/contexts/seller-auth-context"
 
-export default function ClientLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <AnimatePresence mode="wait">
-        <PageTransition>{children}</PageTransition>
-      </AnimatePresence>
-    </ThemeProvider>
+    <AuthProvider>
+      <SellerAuthProvider>
+        <CartProvider>
+          <WishlistProvider>{children}</WishlistProvider>
+        </CartProvider>
+      </SellerAuthProvider>
+    </AuthProvider>
   )
 }

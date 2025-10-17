@@ -1,55 +1,43 @@
 "use client"
-
-import { useState } from "react"
+import { useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useCart } from "@/contexts/cart-context"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Premium Cotton T-Shirt",
-      price: 29.99,
-      quantity: 2,
-      image: "/placeholder.svg?height=100&width=100",
-      color: "Black",
-      size: "M",
-    },
-    {
-      id: 2,
-      name: "Wireless Earbuds",
-      price: 79.99,
-      quantity: 1,
-      image: "/placeholder.svg?height=100&width=100",
-      color: "White",
-      size: "One Size",
-    },
-  ])
-
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return
-    setCartItems(cartItems.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item)))
-  }
-
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id))
-  }
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const { items, updateQuantity, removeFromCart, subtotal } = useCart()
+  const { user } = useAuth()
+  const router = useRouter()
   const shipping = subtotal > 50 ? 0 : 5.99
-  const total = subtotal + shipping 
+  const total = subtotal + shipping
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      router.push("/login")
+    }
+  }, [user, router])
+
+  // Don't render anything until we check authentication
+  if (!user) {
+    return null
+  }
 
   return (
     <div className="container px-4 md:px-6 py-6 md:py-10">
       <h1 className="text-3xl font-bold mb-6">Your Basket</h1>
-      {cartItems.length === 0 ? (
+      {items.length === 0 ? (
         <div className="text-center py-12">
           <h2 className="text-2xl font-semibold mb-4">Your basket is empty</h2>
-          <p className="text-muted-foreground mb-6">Looks like you haven&apos;t added any products to your basket yet.</p>
+          <p className="text-muted-foreground mb-6">
+            Looks like you haven&apos;t added any products to your basket yet.
+          </p>
           <Link href="/products">
             <Button>Continue Shopping</Button>
           </Link>
@@ -70,7 +58,7 @@ export default function CartPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cartItems.map((item) => (
+                  {items.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell>
                         <img
@@ -118,7 +106,7 @@ export default function CartPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => removeFromCart(item.id)}
                           className="text-muted-foreground hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />

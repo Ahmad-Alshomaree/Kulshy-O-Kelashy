@@ -1,187 +1,329 @@
 "use client"
 
-import { useState } from "react"
-import { Heart, Share, ShoppingCart, Star } from "lucide-react"
+import { useState, useEffect } from "react"
+import { ChevronLeft, Heart, Star, Truck, ShieldCheck, RotateCcw } from "lucide-react"
+import Link from "next/link"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useCart } from "@/contexts/cart-context"
+import { useWishlist } from "@/contexts/wishlist-context"
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const [mainImage, setMainImage] = useState("/placeholder.svg?height=600&width=600")
-
-  // Mock product data
-  const product = {
-    id: params.id,
-    name: "Premium Cotton T-Shirt",
+// Mock product data - in a real app, this would come from an API
+const getProductById = (id: string) => {
+  return {
+    id: Number.parseInt(id),
+    name: "Premium Eco-Friendly Cotton T-Shirt",
+    description:
+      "Made from 100% organic cotton, this premium t-shirt is both comfortable and environmentally friendly. The breathable fabric ensures all-day comfort, while the classic cut provides a timeless look that pairs well with any outfit.",
     price: 29.99,
+    originalPrice: 39.99,
     rating: 4.5,
     reviewCount: 127,
-    description:
-      "Our Premium Cotton T-Shirt is crafted from 100% organic cotton for ultimate comfort and durability. This versatile piece features a classic fit, making it perfect for everyday wear. The breathable fabric ensures you stay cool and comfortable all day long.",
-    features: ["100% organic cotton", "Classic fit", "Breathable fabric", "Pre-shrunk", "Machine washable"],
     images: [
       "/placeholder.svg?height=600&width=600",
       "/placeholder.svg?height=600&width=600&text=Image+2",
       "/placeholder.svg?height=600&width=600&text=Image+3",
       "/placeholder.svg?height=600&width=600&text=Image+4",
     ],
-    colors: ["Black", "White", "Navy", "Gray"],
+    colors: ["Black", "White", "Navy", "Green"],
     sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+    features: [
+      "100% Organic Cotton",
+      "Eco-friendly manufacturing",
+      "Breathable fabric",
+      "Machine washable",
+      "Pre-shrunk",
+    ],
+    specifications: {
+      Material: "100% Organic Cotton",
+      Weight: "180 gsm",
+      Fit: "Regular",
+      Care: "Machine wash cold, tumble dry low",
+      Origin: "Ethically made in Portugal",
+    },
+    stock: 42,
+    sku: "ECO-TS-001",
+    categories: ["Clothing", "T-Shirts", "Eco-Friendly"],
+    tags: ["organic", "sustainable", "casual", "essential"],
+  }
+}
+
+export default function ProductPage({ params }: { params: { id: string } }) {
+  const product = getProductById(params.id)
+  const [mainImage, setMainImage] = useState(product.images[0])
+  const [selectedColor, setSelectedColor] = useState(product.colors[0])
+  const [selectedSize, setSelectedSize] = useState(product.sizes[2]) // Default to Medium
+  const [quantity, setQuantity] = useState(1)
+  const [isInCart, setIsInCart] = useState(false)
+  const { addToCart, items } = useCart()
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist()
+  const router = useRouter()
+
+  const isWishlisted = isInWishlist(product.id)
+
+  useEffect(() => {
+    if (items.some((item) => item.id === product.id)) {
+      setIsInCart(true)
+    }
+  }, [items, product.id])
+
+  const handleAddToCart = () => {
+    addToCart(
+      {
+        ...product,
+        color: selectedColor,
+        size: selectedSize,
+      },
+      quantity,
+    )
+    setIsInCart(true)
+    toast.success(`${quantity} × ${product.name} added to cart`)
+  }
+
+  const handleWishlistToggle = () => {
+    if (isWishlisted) {
+      removeFromWishlist(product.id)
+      toast.success(`${product.name} removed from favorites`)
+    } else {
+      addToWishlist({
+        ...product,
+        color: selectedColor,
+        size: selectedSize,
+        image: mainImage, // Add the main image as the required 'image' property
+      })
+      toast.success(`${product.name} added to favorites`)
+    }
   }
 
   return (
     <div className="container px-4 md:px-6 py-6 md:py-10">
-      <div className="grid md:grid-cols-2 gap-6 lg:gap-12">
+      <div className="flex items-center mb-6 text-sm">
+        <Link href="/products" className="text-palette-darkGreen hover:text-palette-olive flex items-center">
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          Back to Products
+        </Link>
+        <div className="mx-2 text-palette-darkGreen/40">/</div>
+        <div className="text-palette-darkGreen/60">
+          {product.categories.map((category, i) => (
+            <span key={category}>
+              <Link href={`/products?category=${category.toLowerCase()}`} className="hover:text-palette-olive">
+                {category}
+              </Link>
+              {i < product.categories.length - 1 && <span className="mx-1">/</span>}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+        {/* Product Images */}
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-lg border bg-background">
-            <img
-              src={mainImage || "/placeholder.svg"}
-              alt={product.name}
-              className="aspect-square w-full object-cover"
-            />
+          <div className="aspect-square overflow-hidden rounded-lg border bg-white">
+            <img src={mainImage || "/placeholder.svg"} alt={product.name} className="w-full h-full object-cover" />
           </div>
-          <div className="flex items-center gap-2 overflow-auto pb-2">
+          <div className="grid grid-cols-4 gap-2">
             {product.images.map((image, index) => (
               <button
                 key={index}
-                className={`relative overflow-hidden rounded border ${
-                  mainImage === image ? "ring-2 ring-primary" : ""
+                className={`aspect-square rounded-md overflow-hidden border-2 ${
+                  mainImage === image ? "border-palette-olive" : "border-transparent"
                 }`}
                 onClick={() => setMainImage(image)}
               >
                 <img
                   src={image || "/placeholder.svg"}
-                  alt={`${product.name} thumbnail ${index + 1}`}
-                  className="aspect-square w-20 object-cover"
+                  alt={`Product view ${index + 1}`}
+                  className="w-full h-full object-cover"
                 />
               </button>
             ))}
           </div>
         </div>
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold">{product.name}</h1>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-5 w-5 ${
-                      i < Math.floor(product.rating)
-                        ? "fill-primary text-primary"
-                        : i < product.rating
-                          ? "fill-primary text-primary opacity-50"
-                          : "text-muted-foreground"
-                    }`}
-                  />
-                ))}
-                <span className="ml-2 text-sm text-muted-foreground">({product.reviewCount} reviews)</span>
-              </div>
+
+        {/* Product Details */}
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-palette-darkGreen mb-2">{product.name}</h1>
+
+          <div className="flex items-center mb-4">
+            <div className="flex mr-2">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-4 h-4 ${
+                    i < Math.floor(product.rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-sm text-palette-darkGreen/60">
+              {product.rating} ({product.reviewCount} reviews)
+            </span>
+          </div>
+
+          <div className="flex items-center mb-6">
+            <span className="text-2xl font-bold text-palette-olive mr-2">${product.price.toFixed(2)}</span>
+            {product.originalPrice && (
+              <span className="text-palette-darkGreen/60 line-through">${product.originalPrice.toFixed(2)}</span>
+            )}
+            {product.originalPrice && (
+              <span className="ml-2 text-sm bg-red-100 text-red-700 px-2 py-0.5 rounded">
+                Save ${(product.originalPrice - product.price).toFixed(2)}
+              </span>
+            )}
+          </div>
+
+          <p className="text-palette-darkGreen/80 mb-6">{product.description}</p>
+
+          {/* Color Selection */}
+          <div className="mb-6">
+            <h3 className="font-medium text-palette-darkGreen mb-2">Color: {selectedColor}</h3>
+            <div className="flex flex-wrap gap-2">
+              {product.colors.map((color) => (
+                <button
+                  key={color}
+                  className={`px-3 py-1 rounded-md border ${
+                    selectedColor === color
+                      ? "border-palette-olive bg-palette-olive/10 text-palette-olive"
+                      : "border-gray-300 hover:border-palette-olive"
+                  }`}
+                  onClick={() => setSelectedColor(color)}
+                >
+                  {color}
+                </button>
+              ))}
             </div>
           </div>
-          <div className="text-3xl font-bold">${product.price}</div>
-          <Separator />
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="color">Color</Label>
-              <RadioGroup id="color" defaultValue="black" className="flex flex-wrap gap-2">
-                {product.colors.map((color) => (
-                  <div key={color.toLowerCase()}>
-                    <RadioGroupItem
-                      value={color.toLowerCase()}
-                      id={`color-${color.toLowerCase()}`}
-                      className="peer sr-only"
-                    />
-                    <Label
-                      htmlFor={`color-${color.toLowerCase()}`}
-                      className="flex cursor-pointer items-center justify-center rounded-md border-2 border-muted bg-transparent px-3 py-2 text-sm font-medium transition-all hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
-                    >
-                      {color}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
+
+          {/* Size Selection */}
+          <div className="mb-6">
+            <h3 className="font-medium text-palette-darkGreen mb-2">Size: {selectedSize}</h3>
+            <div className="flex flex-wrap gap-2">
+              {product.sizes.map((size) => (
+                <button
+                  key={size}
+                  className={`w-10 h-10 flex items-center justify-center rounded-md border ${
+                    selectedSize === size
+                      ? "border-palette-olive bg-palette-olive/10 text-palette-olive"
+                      : "border-gray-300 hover:border-palette-olive"
+                  }`}
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </button>
+              ))}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="size">Size</Label>
-              <RadioGroup id="size" defaultValue="m" className="flex flex-wrap gap-2">
-                {product.sizes.map((size) => (
-                  <div key={size.toLowerCase()}>
-                    <RadioGroupItem
-                      value={size.toLowerCase()}
-                      id={`size-${size.toLowerCase()}`}
-                      className="peer sr-only"
-                    />
-                    <Label
-                      htmlFor={`size-${size.toLowerCase()}`}
-                      className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-md border-2 border-muted bg-transparent text-sm font-medium transition-all hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
-                    >
-                      {size}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity</Label>
-              <Select defaultValue="1">
-                <SelectTrigger id="quantity" className="w-24">
-                  <SelectValue placeholder="Quantity" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1</SelectItem>
-                  <SelectItem value="2">2</SelectItem>
-                  <SelectItem value="3">3</SelectItem>
-                  <SelectItem value="4">4</SelectItem>
-                  <SelectItem value="5">5</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <a href="#" className="text-sm text-palette-olive hover:underline mt-2 inline-block">
+              Size Guide
+            </a>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Button size="lg" className="flex-1">
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Add to Cart
+
+          {/* Quantity and Add to Cart */}
+          <div className="flex items-center mb-6">
+            <div className="flex items-center border rounded-md mr-4">
+              <button
+                className="px-3 py-2 text-palette-darkGreen hover:text-palette-olive"
+                onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+              >
+                -
+              </button>
+              <Input
+                type="number"
+                min="1"
+                max={product.stock}
+                value={quantity}
+                onChange={(e) => {
+                  const val = Number.parseInt(e.target.value)
+                  if (val > 0 && val <= product.stock) setQuantity(val)
+                }}
+                className="w-12 border-0 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+              <button
+                className="px-3 py-2 text-palette-darkGreen hover:text-palette-olive"
+                onClick={() => quantity < product.stock && setQuantity(quantity + 1)}
+              >
+                +
+              </button>
+            </div>
+            <Button
+              className="bg-palette-olive hover:bg-palette-darkGreen text-white"
+              onClick={isInCart ? () => router.push("/cart") : handleAddToCart}
+            >
+              {isInCart ? "Go to Basket" : "Add to Cart"}
             </Button>
-            <Button size="lg" variant="outline">
-              <Heart className="mr-2 h-4 w-4" />
-              Add to Wishlist
-            </Button>
-            <Button size="icon" variant="outline">
-              <Share className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`ml-2 ${isWishlisted ? "text-red-500" : "text-palette-darkGreen hover:text-palette-olive"}`}
+              onClick={handleWishlistToggle}
+            >
+              <Heart className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`} />
+              <span className="sr-only">{isWishlisted ? "Remove from Favorites" : "Add to Favorites"}</span>
             </Button>
           </div>
-          <Separator />
-          <Tabs defaultValue="description">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="description">Description</TabsTrigger>
-              <TabsTrigger value="features">Features</TabsTrigger>
-              <TabsTrigger value="shipping">Shipping</TabsTrigger>
-            </TabsList>
-            <TabsContent value="description" className="pt-4">
-              <p className="text-muted-foreground">{product.description}</p>
-            </TabsContent>
-            <TabsContent value="features" className="pt-4">
-              <ul className="list-disc pl-5 text-muted-foreground space-y-2">
-                {product.features.map((feature, index) => (
-                  <li key={index}>{feature}</li>
-                ))}
-              </ul>
-            </TabsContent>
-            <TabsContent value="shipping" className="pt-4">
-              <p className="text-muted-foreground">
-                Free standard shipping on all orders over $50. Delivery typically takes 3-5 business days. Express
-                shipping options are available at checkout.
-              </p>
-              <p className="text-muted-foreground mt-2">
-                We offer a 30-day return policy for all unused and unworn items.
-              </p>
-            </TabsContent>
-          </Tabs>
+
+          {/* Stock and SKU */}
+          <div className="text-sm text-palette-darkGreen/60 mb-6">
+            <p>In Stock: {product.stock} items</p>
+            <p>SKU: {product.sku}</p>
+          </div>
+
+          {/* Shipping and Returns */}
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center text-palette-darkGreen">
+              <Truck className="h-5 w-5 mr-2 text-palette-olive" />
+              <span>Free shipping on orders over $50</span>
+            </div>
+            <div className="flex items-center text-palette-darkGreen">
+              <ShieldCheck className="h-5 w-5 mr-2 text-palette-olive" />
+              <span>2-year warranty on all products</span>
+            </div>
+            <div className="flex items-center text-palette-darkGreen">
+              <RotateCcw className="h-5 w-5 mr-2 text-palette-olive" />
+              <span>30-day money-back guarantee</span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Product Tabs */}
+      <div className="mt-12">
+        <Tabs defaultValue="details">
+          <TabsList className="w-full justify-start border-b rounded-none">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="specifications">Specifications</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews</TabsTrigger>
+          </TabsList>
+          <TabsContent value="details" className="py-4">
+            <h3 className="font-semibold text-lg mb-4">Product Features</h3>
+            <ul className="list-disc pl-5 space-y-2 text-palette-darkGreen/80">
+              {product.features.map((feature) => (
+                <li key={feature}>{feature}</li>
+              ))}
+            </ul>
+          </TabsContent>
+          <TabsContent value="specifications" className="py-4">
+            <h3 className="font-semibold text-lg mb-4">Technical Specifications</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Object.entries(product.specifications).map(([key, value]) => (
+                <div key={key} className="flex border-b pb-2">
+                  <span className="font-medium text-palette-darkGreen w-1/3">{key}</span>
+                  <span className="text-palette-darkGreen/80">{value}</span>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="reviews" className="py-4">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-semibold text-lg">Customer Reviews</h3>
+              <Button>Write a Review</Button>
+            </div>
+            <p className="text-palette-darkGreen/60">Reviews will be displayed here.</p>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

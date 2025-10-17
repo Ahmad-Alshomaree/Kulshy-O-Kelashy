@@ -72,6 +72,18 @@ export default function ProductsPage() {
     }
   }, [categoryParam, featureParam])
 
+  // Get page title based on filters
+  const getPageTitle = () => {
+    if (showHighRated) return "High-Rated Items"
+    if (showOffers) return "Offers"
+    if (showMostViewed) return "Most Viewed Products"
+    if (selectedCategory !== "all") {
+      const category = categories.find((cat) => cat.id === selectedCategory)
+      return category ? category.name : "All Products"
+    }
+    return "All Products"
+  }
+
   const products = [
     {
       id: 1,
@@ -320,7 +332,7 @@ export default function ProductsPage() {
           <div className="container px-4 md:px-6 py-6 md:py-10">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight">All Products</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{getPageTitle()}</h1>
                 <p className="text-muted-foreground">Browse our collection of products</p>
               </div>
               <div className="flex items-center gap-4">

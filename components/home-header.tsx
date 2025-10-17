@@ -5,16 +5,27 @@ import { Heart, Search, ShoppingCart, User, Bell } from "lucide-react"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CategoryNav } from "@/components/category-nav"
 import { HoverButton } from "@/components/motion"
 import { useAuth } from "@/contexts/auth-context"
+import { useCart } from "@/contexts/cart-context"
+import { useWishlist } from "@/contexts/wishlist-context"
 
 export function HomeHeader() {
   const [isClient, setIsClient] = useState(false)
   const { user, logout } = useAuth()
   const router = useRouter()
+
+  // Use optional chaining to safely access itemCount
+  const cart = useCart()
+  const cartItemCount = cart && typeof cart.itemCount === "number" ? cart.itemCount : 0
+
+  // Use optional chaining to safely access wishlist itemCount
+  const wishlist = useWishlist()
+  const wishlistItemCount = wishlist && typeof wishlist.itemCount === "number" ? wishlist.itemCount : 0
 
   useEffect(() => {
     setIsClient(true)
@@ -86,8 +97,23 @@ export function HomeHeader() {
             >
               <Link href="/wishlist">
                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                  <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                  <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10">
                     <Heart className="h-5 w-5" />
+                    {wishlistItemCount > 0 && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 15,
+                          delay: 0.5,
+                        }}
+                        className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-xs text-white flex items-center justify-center"
+                      >
+                        {wishlistItemCount}
+                      </motion.span>
+                    )}
                   </Button>
                 </motion.div>
               </Link>
@@ -95,19 +121,21 @@ export function HomeHeader() {
                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                   <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10">
                     <ShoppingCart className="h-5 w-5" />
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 500,
-                        damping: 15,
-                        delay: 0.5,
-                      }}
-                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-palette-cream text-xs text-palette-darkGreen flex items-center justify-center"
-                    >
-                      3
-                    </motion.span>
+                    {cartItemCount > 0 && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 15,
+                          delay: 0.5,
+                        }}
+                        className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-palette-cream text-xs text-palette-darkGreen flex items-center justify-center"
+                      >
+                        {cartItemCount}
+                      </motion.span>
+                    )}
                   </Button>
                 </motion.div>
               </Link>
@@ -122,7 +150,7 @@ export function HomeHeader() {
                       </Button>
                     </motion.div>
                   </Link>
-                  <Link href="/notifications">
+                  <Link href="/account/notifications">
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                       <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                         <Bell className="h-5 w-5" />
@@ -135,7 +163,7 @@ export function HomeHeader() {
                 <>
                   <Link href="/login">
                     <HoverButton>
-                      <Button size="sm" className="bg-palette-cream text-palette-darkGreen hover:bg-white">
+                      <Button size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10">
                         Sign in
                       </Button>
                     </HoverButton>
@@ -153,16 +181,23 @@ export function HomeHeader() {
           ) : (
             <div className="flex items-center gap-4">
               <Link href="/wishlist">
-                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10">
                   <Heart className="h-5 w-5" />
+                  {wishlistItemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-xs text-white flex items-center justify-center">
+                      {wishlistItemCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
               <Link href="/cart">
                 <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10">
                   <ShoppingCart className="h-5 w-5" />
-                  <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-palette-cream text-xs text-palette-darkGreen flex items-center justify-center">
-                    3
-                  </span>
+                  {cartItemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-palette-cream text-xs text-palette-darkGreen flex items-center justify-center">
+                      {cartItemCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
 

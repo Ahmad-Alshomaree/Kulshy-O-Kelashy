@@ -12,13 +12,13 @@ export function CategoryNav() {
   }, [])
 
   const categories = [
-    { name: "Women", href: "/category/women" },
-    { name: "Men", href: "/category/men" },
-    { name: "Children", href: "/category/children" },
-    { name: "Home", href: "/category/home" },
-    { name: "Make-up", href: "/category/makeup" },
-    { name: "Clothes", href: "/category/clothes" },
-    { name: "Electronic", href: "/category/electronic" },
+    { name: "Women", href: "/products?category=women", slug: "women" },
+    { name: "Men", href: "/products?category=men", slug: "men" },
+    { name: "Children", href: "/products?category=children", slug: "children" },
+    { name: "Home", href: "/products?category=home", slug: "home" },
+    { name: "Make-up", href: "/products?category=makeup", slug: "makeup" },
+    { name: "Clothes", href: "/products?category=clothes", slug: "clothes" },
+    { name: "Electronic", href: "/products?category=electronic", slug: "electronic" },
   ]
 
   return (

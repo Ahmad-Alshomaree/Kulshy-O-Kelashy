@@ -9,36 +9,42 @@ export function ProductCategories() {
       name: "Clothing",
       image: "/placeholder.svg?height=400&width=400",
       count: 124,
+      slug: "clothing",
     },
     {
       id: 2,
       name: "Electronics",
       image: "/placeholder.svg?height=400&width=400",
       count: 86,
+      slug: "electronics",
     },
     {
       id: 3,
       name: "Home & Kitchen",
       image: "/placeholder.svg?height=400&width=400",
       count: 157,
+      slug: "home-kitchen",
     },
     {
       id: 4,
       name: "Beauty & Personal Care",
       image: "/placeholder.svg?height=400&width=400",
       count: 92,
+      slug: "beauty",
     },
     {
       id: 5,
       name: "Sports & Outdoors",
       image: "/placeholder.svg?height=400&width=400",
       count: 73,
+      slug: "sports",
     },
     {
       id: 6,
       name: "Toys & Games",
       image: "/placeholder.svg?height=400&width=400",
       count: 45,
+      slug: "toys",
     },
   ]
 
@@ -53,7 +59,7 @@ export function ProductCategories() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {categories.map((category) => (
-            <Link href={`/categories/${category.id}`} key={category.id} className="group">
+            <Link href={`/products?category=${category.slug}`} key={category.id} className="group">
               <Card className="overflow-hidden border-0 shadow-sm transition-all hover:shadow-md h-full">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-palette-darkGreen/80 to-transparent z-10" />

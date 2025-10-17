@@ -1,33 +1,28 @@
-"use client" // Indicates that this component is a client-side component.
-import { motion } from "framer-motion" // Importing motion for animations.
-import { useEffect, useState } from "react" // Importing React hooks.
-import { Button } from "@/components/ui/button" // Importing a custom Button component.
-import { HoverButton } from "@/components/motion" // Importing a custom HoverButton component for motion effects.
+"use client"
+import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
+
+import { Button } from "@/components/ui/button"
+import { HoverButton } from "@/components/motion"
 
 export function HomeHero() {
-  // State to check if the component is rendered on the client-side.
   const [isClient, setIsClient] = useState(false)
 
-  // useEffect to set the state to true after the component mounts.
   useEffect(() => {
     setIsClient(true)
   }, [])
 
   return (
     <section className="w-full bg-palette-cream py-8 md:py-16">
-      {/* Container for the hero section */}
       <div className="container px-4 mx-auto">
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          {/* Conditional rendering based on whether the component is rendered on the client-side */}
           {isClient ? (
             <motion.div
-              // Motion animation for the left content
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               className="order-2 md:order-1"
             >
-              {/* Animated heading */}
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -36,7 +31,6 @@ export function HomeHero() {
               >
                 Sofa Eco Cula
               </motion.h1>
-              {/* Animated star ratings */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -44,7 +38,6 @@ export function HomeHero() {
                 className="flex items-center gap-2 mb-4"
               >
                 <div className="flex">
-                  {/* Render 5 stars with animation */}
                   {[...Array(5)].map((_, i) => (
                     <motion.svg
                       key={i}
@@ -60,7 +53,6 @@ export function HomeHero() {
                 </div>
                 <span className="text-palette-darkGreen/70">(120)</span>
               </motion.div>
-              {/* Animated price */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -69,7 +61,6 @@ export function HomeHero() {
               >
                 $799.99
               </motion.p>
-              {/* Animated buttons */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -90,7 +81,6 @@ export function HomeHero() {
               </motion.div>
             </motion.div>
           ) : (
-            // Static fallback content for server-side rendering
             <div className="order-2 md:order-1">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-palette-darkGreen mb-4">Sofa Eco Cula</h1>
               <div className="flex items-center gap-2 mb-4">
@@ -116,10 +106,8 @@ export function HomeHero() {
             </div>
           )}
 
-          {/* Conditional rendering for the right-side image */}
           {isClient ? (
             <motion.div
-              // Motion animation for the image container
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
@@ -142,7 +130,6 @@ export function HomeHero() {
               </motion.div>
             </motion.div>
           ) : (
-            // Static fallback image for server-side rendering
             <div className="order-1 md:order-2">
               <img
                 src="/placeholder.svg?height=400&width=600&text=Modern+Sofa"

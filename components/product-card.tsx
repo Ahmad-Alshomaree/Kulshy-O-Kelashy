@@ -1,13 +1,19 @@
 "use client"
 
+import type React from "react"
+
 import Link from "next/link"
-import { Heart } from "lucide-react"
+import { Heart, Star } from "lucide-react"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { HoverCard } from "@/components/motion"
+import { useCart } from "@/contexts/cart-context"
+import { useWishlist } from "@/contexts/wishlist-context"
+import { useAuth } from "@/contexts/auth-context"
 
 interface ProductCardProps {
   product: {
@@ -21,15 +27,50 @@ interface ProductCardProps {
     isNew: boolean
     isSale: boolean
     discount: string | null
+    viewCount?: number
   }
 }
 
 export function ProductCard({ product }: ProductCardProps) {
   const [isClient, setIsClient] = useState(false)
+  const [isInCart, setIsInCart] = useState(false)
+  const { addToCart, items } = useCart()
+  const { user } = useAuth()
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist()
 
   useEffect(() => {
     setIsClient(true)
   }, [])
+
+  useEffect(() => {
+    if (user && items.some((item) => item.id === product.id)) {
+      setIsInCart(true)
+    }
+  }, [user, items, product.id])
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    addToCart(product)
+    setIsInCart(true)
+    toast.success(`${product.name} added to cart`)
+  }
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id)
+      toast.success(`${product.name} removed from favorites`)
+    } else {
+      addToWishlist(product)
+      toast.success(`${product.name} added to favorites`)
+    }
+  }
+
+  const isWishlisted = isInWishlist(product.id)
 
   if (!isClient) {
     return (
@@ -45,9 +86,10 @@ export function ProductCard({ product }: ProductCardProps) {
             variant="ghost"
             size="icon"
             className="absolute top-2 right-2 z-10 bg-white/80 hover:bg-white text-palette-darkGreen hover:text-palette-olive"
+            onClick={handleWishlistToggle}
           >
-            <Heart className="h-4 w-4" />
-            <span className="sr-only">Add to wishlist</span>
+            <Heart className={`h-4 w-4 ${isWishlisted ? "fill-red-500 text-red-500" : ""}`} />
+            <span className="sr-only">{isWishlisted ? "Remove from favorites" : "Add to favorites"}</span>
           </Button>
           <Link href={`/products/${product.id}`}>
             <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-full object-cover" />
@@ -62,15 +104,12 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="flex items-center mb-1">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
-                <svg
+                <Star
                   key={i}
                   className={`w-3 h-3 ${
-                    i < Math.floor(product.rating) ? "text-yellow-500" : "text-gray-300"
-                  } fill-current`}
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                </svg>
+                    i < Math.floor(product.rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                  }`}
+                />
               ))}
             </div>
             <span className="text-xs text-palette-darkGreen/60 ml-1">({product.reviewCount})</span>
@@ -85,8 +124,17 @@ export function ProductCard({ product }: ProductCardProps) {
             <Button
               size="sm"
               className="bg-palette-olive hover:bg-palette-darkGreen text-white text-xs px-2 py-1 h-auto"
+              onClick={
+                isInCart
+                  ? (e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      window.location.href = "/cart"
+                    }
+                  : handleAddToCart
+              }
             >
-              Add to Cart
+              {isInCart ? "Go to Basket" : "Add to Cart"}
             </Button>
           </div>
         </div>
@@ -117,9 +165,10 @@ export function ProductCard({ product }: ProductCardProps) {
             variant="ghost"
             size="icon"
             className="bg-white/80 hover:bg-white text-palette-darkGreen hover:text-palette-olive"
+            onClick={handleWishlistToggle}
           >
-            <Heart className="h-4 w-4" />
-            <span className="sr-only">Add to wishlist</span>
+            <Heart className={`h-4 w-4 ${isWishlisted ? "fill-red-500 text-red-500" : ""}`} />
+            <span className="sr-only">{isWishlisted ? "Remove from favorites" : "Add to favorites"}</span>
           </Button>
         </motion.div>
         <Link href={`/products/${product.id}`}>
@@ -141,18 +190,18 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center mb-1">
           <div className="flex">
             {[...Array(5)].map((_, i) => (
-              <motion.svg
+              <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.2, delay: i * 0.1 }}
-                className={`w-3 h-3 ${
-                  i < Math.floor(product.rating) ? "text-yellow-500" : "text-gray-300"
-                } fill-current`}
-                viewBox="0 0 24 24"
               >
-                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-              </motion.svg>
+                <Star
+                  className={`w-3 h-3 ${
+                    i < Math.floor(product.rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                  }`}
+                />
+              </motion.div>
             ))}
           </div>
           <span className="text-xs text-palette-darkGreen/60 ml-1">({product.reviewCount})</span>
@@ -173,8 +222,17 @@ export function ProductCard({ product }: ProductCardProps) {
             <Button
               size="sm"
               className="bg-palette-olive hover:bg-palette-darkGreen text-white text-xs px-2 py-1 h-auto"
+              onClick={
+                isInCart
+                  ? (e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      window.location.href = "/cart"
+                    }
+                  : handleAddToCart
+              }
             >
-              Add to Cart
+              {isInCart ? "Go to Basket" : "Add to Cart"}
             </Button>
           </motion.div>
         </div>

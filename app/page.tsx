@@ -1,4 +1,3 @@
-import { Newsletter } from "@/components/newsletter"
 import { PageTransitionWrapper } from "@/components/page-transition-wrapper"
 import { HomeHero } from "@/components/home-hero"
 import { HomeProductSection } from "@/components/home-product-section"
@@ -196,7 +195,6 @@ export default function Home() {
           <HomeProductSection title="Most Viewed" products={mostViewedProducts} featureType="most-viewed" />
 
           {/* Newsletter */}
-          <Newsletter />
         </main>
 
         <HomeFooter />

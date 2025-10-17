@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { ArrowLeft, Package, Search, ChevronRight, Filter } from 'lucide-react'
+import { ArrowLeft, Package, Search, ChevronRight, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,91 +14,30 @@ import { useAuth } from "@/contexts/auth-context"
 import { PageTransitionWrapper } from "@/components/page-transition-wrapper"
 
 export default function OrdersPage() {
-  const { user } = useAuth()
+  const { user, orders } = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
+  const router = useRouter()
 
-  // Mock order data
-  const orders = [
-    {
-      id: "ORD-12345",
-      date: "April 28, 2023",
-      total: 129.99,
-      status: "delivered",
-      items: [
-        {
-          id: 1,
-          name: "Premium Cotton T-Shirt",
-          quantity: 2,
-          price: 29.99,
-          image: "/placeholder.svg?height=80&width=80",
-        },
-        {
-          id: 2,
-          name: "Wireless Earbuds",
-          quantity: 1,
-          price: 79.99,
-          image: "/placeholder.svg?height=80&width=80",
-        },
-      ],
-    },
-    {
-      id: "ORD-12344",
-      date: "April 15, 2023",
-      total: 89.99,
-      status: "processing",
-      items: [
-        {
-          id: 3,
-          name: "Leather Crossbody Bag",
-          quantity: 1,
-          price: 89.99,
-          image: "/placeholder.svg?height=80&width=80",
-        },
-      ],
-    },
-    {
-      id: "ORD-12343",
-      date: "March 22, 2023",
-      total: 149.98,
-      status: "delivered",
-      items: [
-        {
-          id: 4,
-          name: "Smart Watch",
-          quantity: 1,
-          price: 149.98,
-          image: "/placeholder.svg?height=80&width=80",
-        },
-      ],
-    },
-    {
-      id: "ORD-12342",
-      date: "February 10, 2023",
-      total: 24.99,
-      status: "cancelled",
-      items: [
-        {
-          id: 5,
-          name: "Cotton T-Shirt",
-          quantity: 1,
-          price: 24.99,
-          image: "/placeholder.svg?height=80&width=80",
-        },
-      ],
-    },
-  ]
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      router.push("/login")
+    }
+  }, [user, router])
 
   // Filter orders based on search term and status
   const filteredOrders = orders.filter((order) => {
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    const matchesSearch =
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.items.some((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
     const matchesStatus = filterStatus === "all" || order.status === filterStatus
     return matchesSearch && matchesStatus
   })
 
+  // Don't render anything until we check authentication
   if (!user) {
-    return null // Don't render anything while redirecting
+    return null
   }
 
   const getStatusBadge = (status: string) => {
@@ -227,9 +167,7 @@ export default function OrdersPage() {
                       : "You haven't placed any orders yet"}
                   </p>
                   <Link href="/products">
-                    <Button className="bg-palette-olive hover:bg-palette-darkGreen text-white">
-                      Start Shopping
-                    </Button>
+                    <Button className="bg-palette-olive hover:bg-palette-darkGreen text-white">Start Shopping</Button>
                   </Link>
                 </div>
               )}

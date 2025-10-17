@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { AlertCircle, Home, RefreshCw } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import { HoverButton } from "@/components/motion"
 

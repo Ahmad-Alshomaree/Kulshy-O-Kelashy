@@ -1,21 +1,66 @@
-// ask for more details about the buisiness
-
-
 "use client"
+
+import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
 import { Eye, EyeOff } from "lucide-react"
-
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
+import { useSellerAuth } from "@/contexts/seller-auth-context"
 
 export default function SellerSignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [businessName, setBusinessName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [businessAddress, setBusinessAddress] = useState("")
+  const [businessDescription, setBusinessDescription] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+
+  const { signupSeller, isSellerAuthenticated } = useSellerAuth()
+  const router = useRouter()
+
+  // If already authenticated, redirect to seller dashboard
+  if (isSellerAuthenticated) {
+    router.push("/seller")
+    return null
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+
+    // Validate form
+    if (password !== confirmPassword) {
+      setError("Passwords do not match")
+      return
+    }
+
+    if (!termsAccepted) {
+      setError("You must accept the terms and conditions")
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      await signupSeller(businessName, email, password)
+    } catch (err) {
+      setError("Failed to create account. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-palette-cream/30 flex flex-col">
@@ -29,7 +74,13 @@ export default function SellerSignUpPage() {
             <p className="mt-2 text-palette-darkGreen/70">Start selling on our platform</p>
           </div>
 
-          <form className="mt-8 space-y-6">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="business-name" className="text-palette-darkGreen">
@@ -41,6 +92,8 @@ export default function SellerSignUpPage() {
                   placeholder="Your business name"
                   className="mt-1 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                   required
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
                 />
               </div>
 
@@ -54,6 +107,8 @@ export default function SellerSignUpPage() {
                   placeholder="Enter your business email"
                   className="mt-1 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -67,6 +122,8 @@ export default function SellerSignUpPage() {
                   placeholder="Enter your business phone"
                   className="mt-1 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                   required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
 
@@ -79,6 +136,8 @@ export default function SellerSignUpPage() {
                   placeholder="Enter your business address"
                   className="mt-1 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                   required
+                  value={businessAddress}
+                  onChange={(e) => setBusinessAddress(e.target.value)}
                 />
               </div>
 
@@ -91,6 +150,8 @@ export default function SellerSignUpPage() {
                   placeholder="Tell us about your business"
                   className="mt-1 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                   required
+                  value={businessDescription}
+                  onChange={(e) => setBusinessDescription(e.target.value)}
                 />
               </div>
 
@@ -105,6 +166,8 @@ export default function SellerSignUpPage() {
                     placeholder="Create a password"
                     className="pr-10 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
                     type="button"
@@ -130,6 +193,8 @@ export default function SellerSignUpPage() {
                     placeholder="Confirm your password"
                     className="pr-10 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                     required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                   <button
                     type="button"
@@ -143,7 +208,12 @@ export default function SellerSignUpPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center">
-                  <Checkbox id="terms" required />
+                  <Checkbox
+                    id="terms"
+                    required
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                  />
                   <Label htmlFor="terms" className="ml-2 text-sm text-palette-darkGreen">
                     I agree to the{" "}
                     <Link href="/terms" className="text-palette-olive hover:text-palette-darkGreen">
@@ -162,13 +232,17 @@ export default function SellerSignUpPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-palette-darkGreen hover:bg-palette-olive text-white py-6">
-              Create Seller Account
+            <Button
+              type="submit"
+              className="w-full bg-palette-darkGreen hover:bg-palette-olive text-white py-6"
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating Account..." : "Create Seller Account"}
             </Button>
 
             <div className="text-center">
               <span className="text-palette-darkGreen/70">Already have an account? </span>
-              <Link href="/login" className="text-palette-olive hover:text-palette-darkGreen font-medium">
+              <Link href="/login/seller" className="text-palette-olive hover:text-palette-darkGreen font-medium">
                 Sign in
               </Link>
             </div>

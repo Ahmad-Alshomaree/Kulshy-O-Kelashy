@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import Link from "next/link"
 import { Eye, EyeOff } from "lucide-react"
@@ -7,9 +9,39 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useSellerAuth } from "@/contexts/seller-auth-context"
+import { useRouter } from "next/navigation"
 
 export default function SellerLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [storeId, setStoreId] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+
+  const { loginSeller, isSellerAuthenticated } = useSellerAuth()
+  const router = useRouter()
+
+  // If already authenticated, redirect to seller dashboard
+  if (isSellerAuthenticated) {
+    router.push("/seller")
+    return null
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setIsLoading(true)
+
+    try {
+      await loginSeller(email, password, storeId)
+    } catch (err) {
+      setError("Failed to login. Please check your credentials.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-palette-cream/30 flex flex-col">
@@ -23,7 +55,13 @@ export default function SellerLoginPage() {
             <p className="mt-2 text-palette-darkGreen/70">Enter your seller account details below</p>
           </div>
 
-          <form className="mt-8 space-y-6">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="email" className="text-palette-darkGreen">
@@ -35,6 +73,8 @@ export default function SellerLoginPage() {
                   placeholder="Enter your email"
                   className="mt-1 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -49,6 +89,8 @@ export default function SellerLoginPage() {
                     placeholder="Enter your password"
                     className="pr-10 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
                     type="button"
@@ -70,6 +112,8 @@ export default function SellerLoginPage() {
                   placeholder="Enter your store ID"
                   className="mt-1 border-palette-taupe/50 focus:border-palette-olive focus:ring-palette-olive"
                   required
+                  value={storeId}
+                  onChange={(e) => setStoreId(e.target.value)}
                 />
               </div>
 
@@ -86,13 +130,17 @@ export default function SellerLoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-palette-darkGreen hover:bg-palette-olive text-white py-6">
-              Sign In as Seller
+            <Button
+              type="submit"
+              className="w-full bg-palette-darkGreen hover:bg-palette-olive text-white py-6"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing In..." : "Sign In as Seller"}
             </Button>
 
             <div className="text-center">
               <span className="text-palette-darkGreen/70">Don&apos;t have a seller account? </span>
-              <Link href="/seller/signup" className="text-palette-olive hover:text-palette-darkGreen font-medium">
+              <Link href="/signup/seller" className="text-palette-olive hover:text-palette-darkGreen font-medium">
                 Apply to become a seller
               </Link>
             </div>

@@ -1,95 +1,60 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { ArrowLeft, Heart, Search, ShoppingCart, Trash2, X } from "lucide-react"
+import { toast } from "sonner"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/contexts/auth-context"
 import { PageTransitionWrapper } from "@/components/page-transition-wrapper"
-import { useToast } from "@/hooks/use-toast"
+import { useWishlist } from "@/contexts/wishlist-context"
+import { useCart } from "@/contexts/cart-context"
 
 export default function WishlistPage() {
   const { user } = useAuth()
-  const { toast } = useToast()
+  const { wishlistItems, removeFromWishlist, clearWishlist } = useWishlist()
+  const { addToCart } = useCart()
   const [searchTerm, setSearchTerm] = useState("")
+  const router = useRouter()
 
-  // Mock wishlist data
-  const [wishlistItems, setWishlistItems] = useState([
-    {
-      id: 1,
-      name: "Premium Cotton T-Shirt",
-      price: 29.99,
-      originalPrice: 39.99,
-      image: "/placeholder.svg?height=200&width=200",
-      category: "Clothing",
-      inStock: true,
-    },
-    {
-      id: 2,
-      name: "Wireless Earbuds",
-      price: 79.99,
-      originalPrice: null,
-      image: "/placeholder.svg?height=200&width=200",
-      category: "Electronics",
-      inStock: true,
-    },
-    {
-      id: 3,
-      name: "Leather Crossbody Bag",
-      price: 89.99,
-      originalPrice: 129.99,
-      image: "/placeholder.svg?height=200&width=200",
-      category: "Accessories",
-      inStock: false,
-    },
-    {
-      id: 4,
-      name: "Smart Watch",
-      price: 149.98,
-      originalPrice: null,
-      image: "/placeholder.svg?height=200&width=200",
-      category: "Electronics",
-      inStock: true,
-    },
-  ])
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      router.push("/login")
+    }
+  }, [user, router])
 
   // Filter wishlist items based on search term
   const filteredItems = wishlistItems.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase()),
+      (item.category && item.category.toLowerCase().includes(searchTerm.toLowerCase())),
   )
 
-  const removeFromWishlist = (id: number) => {
-    setWishlistItems(wishlistItems.filter((item) => item.id !== id))
-    toast({
-      title: "Removed from Favorites",
-      description: "Item has been removed from your favorites.",
-    })
+  const handleRemoveFromWishlist = (id: number, name: string) => {
+    removeFromWishlist(id)
+    toast.success(`${name} removed from favorites`)
   }
 
-  const addToCart = (id: number) => {
-    // Here you would typically add the item to the cart
-    toast({
-      title: "Added to Cart",
-      description: "Item has been added to your cart.",
-    })
+  const handleAddToCart = (item: any) => {
+    addToCart(item)
+    toast.success(`${item.name} added to cart`)
   }
 
-  const clearWishlist = () => {
-    setWishlistItems([])
-    toast({
-      title: "Favorites Cleared",
-      description: "All items have been removed from your favorites.",
-    })
+  const handleClearWishlist = () => {
+    clearWishlist()
+    toast.success("All items have been removed from your favorites")
   }
 
+  // Don't render anything until we check authentication
   if (!user) {
-    return null // Don't render anything while redirecting
+    return null
   }
 
   return (
@@ -110,7 +75,7 @@ export default function WishlistPage() {
                 {wishlistItems.length > 0 && (
                   <Button
                     variant="outline"
-                    onClick={clearWishlist}
+                    onClick={handleClearWishlist}
                     className="border-palette-olive text-palette-olive hover:bg-palette-olive hover:text-white"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
@@ -165,19 +130,21 @@ export default function WishlistPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => removeFromWishlist(item.id)}
+                              onClick={() => handleRemoveFromWishlist(item.id, item.name)}
                               className="absolute top-2 right-2 bg-white/80 hover:bg-white text-red-500 hover:text-red-600"
                             >
                               <Heart className="h-4 w-4 fill-current" />
                             </Button>
-                            {!item.inStock && (
+                            {item.inStock === false && (
                               <Badge className="absolute bottom-2 left-2 bg-red-500" variant="secondary">
                                 Out of Stock
                               </Badge>
                             )}
                           </div>
                           <div className="p-4 flex flex-col flex-1">
-                            <div className="text-sm text-palette-darkGreen/70 mb-1">{item.category}</div>
+                            <div className="text-sm text-palette-darkGreen/70 mb-1">
+                              {item.category || "Uncategorized"}
+                            </div>
                             <Link href={`/products/${item.id}`} className="block flex-1">
                               <h3 className="font-medium text-palette-darkGreen mb-2 hover:text-palette-olive transition-colors">
                                 {item.name}
@@ -192,12 +159,12 @@ export default function WishlistPage() {
                               )}
                             </div>
                             <Button
-                              onClick={() => addToCart(item.id)}
-                              disabled={!item.inStock}
+                              onClick={() => handleAddToCart(item)}
+                              disabled={item.inStock === false}
                               className="w-full bg-palette-olive hover:bg-palette-darkGreen text-white"
                             >
                               <ShoppingCart className="h-4 w-4 mr-2" />
-                              {item.inStock ? "Add to Basket" : "Out of Stock"}
+                              {item.inStock === false ? "Out of Stock" : "Add to Basket"}
                             </Button>
                           </div>
                         </CardContent>

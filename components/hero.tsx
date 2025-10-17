@@ -112,7 +112,7 @@ export function Hero() {
                   </Button>
                 </HoverButton>
               </Link>
-              <Link href="/categories">
+              <Link href="/products">
                 <HoverButton>
                   <Button
                     size="lg"
