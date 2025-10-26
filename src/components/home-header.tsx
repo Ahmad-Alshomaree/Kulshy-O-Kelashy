@@ -99,7 +99,7 @@ export function HomeHeader() {
             </motion.div>
           ) : (
             <a href="/" onClick={handleLogoClick} className="font-bold text-2xl cursor-pointer">
-              Kulshy O-Klashy
+              {siteSettings.siteName}
             </a>
           )}
 
