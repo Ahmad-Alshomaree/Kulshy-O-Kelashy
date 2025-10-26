@@ -23,9 +23,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+interface SiteSettings {
+  siteName: string
+}
+
 export function HomeHeader() {
   const [isClient, setIsClient] = useState(false)
   const [showSplash, setShowSplash] = useState(false)
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ siteName: 'Kulshy O-Klashy' })
   const { data: session, isPending, refetch } = useSession()
   const router = useRouter()
 
@@ -39,6 +44,12 @@ export function HomeHeader() {
 
   useEffect(() => {
     setIsClient(true)
+    
+    // Fetch site settings
+    fetch('/api/site-settings')
+      .then(res => res.json())
+      .then(data => setSiteSettings(data))
+      .catch(error => console.error('Error fetching site settings:', error))
   }, [])
 
   const handleSignOut = async () => {
