@@ -5,11 +5,39 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { HoverButton } from "@/components/motion"
 
+interface HeroData {
+  title: string
+  subtitle?: string
+  price: number
+  originalPrice?: number
+  rating: number
+  reviewCount: number
+  image: string
+  buttons: {
+    primary: { text: string; link: string }
+    secondary: { text: string; link: string }
+  }
+}
+
 export function HomeHero() {
   const [isClient, setIsClient] = useState(false)
+  const [heroData, setHeroData] = useState<HeroData | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setIsClient(true)
+    
+    // Fetch hero section data
+    fetch('/api/hero-section')
+      .then(res => res.json())
+      .then(data => {
+        setHeroData(data)
+        setLoading(false)
+      })
+      .catch(error => {
+        console.error('Error fetching hero data:', error)
+        setLoading(false)
+      })
   }, [])
 
   return (
