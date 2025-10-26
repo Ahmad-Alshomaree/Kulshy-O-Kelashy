@@ -9,17 +9,74 @@ import { Input } from "@/components/ui/input"
 import { SlideUp, HoverButton } from "@/components/motion"
 import { LogoSplashScreen } from "@/components/logo-splash-screen"
 
+interface FooterData {
+  newsletter: {
+    title: string
+    description: string
+  }
+  columns: Array<{
+    title: string
+    links: Array<{
+      label: string
+      url: string
+    }>
+  }>
+  downloadApp: {
+    title: string
+    description: string
+    appStoreUrl?: string
+    playStoreUrl?: string
+    qrCode?: string
+  }
+  copyright: string
+}
+
 export function HomeFooter() {
   const [isClient, setIsClient] = useState(false)
   const [showSplash, setShowSplash] = useState(false)
+  const [footerData, setFooterData] = useState<FooterData | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setIsClient(true)
+    
+    // Fetch footer data
+    fetch('/api/footer-section')
+      .then(res => res.json())
+      .then(data => {
+        setFooterData(data)
+        setLoading(false)
+      })
+      .catch(error => {
+        console.error('Error fetching footer data:', error)
+        setLoading(false)
+      })
   }, [])
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault()
     setShowSplash(true)
+  }
+
+  if (loading || !footerData) {
+    return (
+      <footer className="bg-palette-darkGreen text-white py-10">
+        <div className="container px-4 mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 animate-pulse">
+            {[...Array(4)].map((_, i) => (
+              <div key={i}>
+                <div className="h-6 bg-white/20 rounded mb-4 w-1/2"></div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-white/20 rounded"></div>
+                  <div className="h-4 bg-white/20 rounded"></div>
+                  <div className="h-4 bg-white/20 rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </footer>
+    )
   }
 
   return (
@@ -31,8 +88,8 @@ export function HomeFooter() {
           {isClient ? (
             <>
               <SlideUp delay={0.1}>
-                <h3 className="font-bold text-lg mb-4">Newsletter</h3>
-                <p className="text-white/70 mb-4">Subscribe to our newsletter to get updates on our latest offers!</p>
+                <h3 className="font-bold text-lg mb-4">{footerData.newsletter.title}</h3>
+                <p className="text-white/70 mb-4">{footerData.newsletter.description}</p>
                 <div className="flex">
                   <Input
                     type="email"
@@ -47,91 +104,64 @@ export function HomeFooter() {
                 </div>
               </SlideUp>
 
-              <SlideUp delay={0.2}>
-                <h3 className="font-bold text-lg mb-4">Support</h3>
-                <ul className="space-y-2">
-                  <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="/support/contact" className="text-white/70 hover:text-palette-cream">
-                      Contact Us
-                    </Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="/support/shipping" className="text-white/70 hover:text-palette-cream">
-                      Shipping Info
-                    </Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="/support/returns" className="text-white/70 hover:text-palette-cream">
-                      Returns
-                    </Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="/support/faq" className="text-white/70 hover:text-palette-cream">
-                      FAQ
-                    </Link>
-                  </motion.li>
-                </ul>
-              </SlideUp>
-
-              <SlideUp delay={0.3}>
-                <h3 className="font-bold text-lg mb-4">Account</h3>
-                <ul className="space-y-2">
-                  <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="/account" className="text-white/70 hover:text-palette-cream">
-                      My Account
-                    </Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="/account/orders" className="text-white/70 hover:text-palette-cream">
-                      Order History
-                    </Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="/wishlist" className="text-white/70 hover:text-palette-cream">
-                      Wishlist
-                    </Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="/account/personal-info" className="text-white/70 hover:text-palette-cream">
-                      Profile
-                    </Link>
-                  </motion.li>
-                </ul>
-              </SlideUp>
+              {footerData.columns.map((column, columnIndex) => (
+                <SlideUp key={columnIndex} delay={0.2 + columnIndex * 0.1}>
+                  <h3 className="font-bold text-lg mb-4">{column.title}</h3>
+                  <ul className="space-y-2">
+                    {column.links.map((link, linkIndex) => (
+                      <motion.li 
+                        key={linkIndex}
+                        whileHover={{ x: 5 }} 
+                        transition={{ type: "spring", stiffness: 400 }}
+                      >
+                        <Link href={link.url} className="text-white/70 hover:text-palette-cream">
+                          {link.label}
+                        </Link>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </SlideUp>
+              ))}
 
               <SlideUp delay={0.4}>
-                <h3 className="font-bold text-lg mb-4">Download App</h3>
-                <p className="text-white/70 mb-4">Get our mobile app for a better experience</p>
+                <h3 className="font-bold text-lg mb-4">{footerData.downloadApp.title}</h3>
+                <p className="text-white/70 mb-4">{footerData.downloadApp.description}</p>
                 <div className="flex space-x-2">
-                  <motion.div whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="#" className="block">
-                      <img
-                        src="/placeholder.svg?height=40&width=120&text=App+Store"
-                        alt="Download on App Store"
-                        className="h-10"
-                      />
-                    </Link>
-                  </motion.div>
-                  <motion.div whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 400 }}>
-                    <Link href="#" className="block">
-                      <img
-                        src="/placeholder.svg?height=40&width=120&text=Google+Play"
-                        alt="Get it on Google Play"
-                        className="h-10"
-                      />
-                    </Link>
-                  </motion.div>
+                  {footerData.downloadApp.appStoreUrl && (
+                    <motion.div whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 400 }}>
+                      <Link href={footerData.downloadApp.appStoreUrl} className="block">
+                        <img
+                          src="/placeholder.svg?height=40&width=120&text=App+Store"
+                          alt="Download on App Store"
+                          className="h-10"
+                        />
+                      </Link>
+                    </motion.div>
+                  )}
+                  {footerData.downloadApp.playStoreUrl && (
+                    <motion.div whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 400 }}>
+                      <Link href={footerData.downloadApp.playStoreUrl} className="block">
+                        <img
+                          src="/placeholder.svg?height=40&width=120&text=Google+Play"
+                          alt="Get it on Google Play"
+                          className="h-10"
+                        />
+                      </Link>
+                    </motion.div>
+                  )}
                 </div>
-                <motion.div className="mt-4" whileHover={{ rotate: 5 }} transition={{ type: "spring", stiffness: 300 }}>
-                  <img src="/placeholder.svg?height=100&width=100&text=QR+Code" alt="QR Code" className="h-24 w-24" />
-                </motion.div>
+                {footerData.downloadApp.qrCode && (
+                  <motion.div className="mt-4" whileHover={{ rotate: 5 }} transition={{ type: "spring", stiffness: 300 }}>
+                    <img src={footerData.downloadApp.qrCode} alt="QR Code" className="h-24 w-24" />
+                  </motion.div>
+                )}
               </SlideUp>
             </>
           ) : (
             <>
               <div>
-                <h3 className="font-bold text-lg mb-4">Newsletter</h3>
-                <p className="text-white/70 mb-4">Subscribe to our newsletter to get updates on our latest offers!</p>
+                <h3 className="font-bold text-lg mb-4">{footerData.newsletter.title}</h3>
+                <p className="text-white/70 mb-4">{footerData.newsletter.description}</p>
                 <div className="flex">
                   <Input
                     type="email"
@@ -144,80 +174,49 @@ export function HomeFooter() {
                 </div>
               </div>
 
-              <div>
-                <h3 className="font-bold text-lg mb-4">Support</h3>
-                <ul className="space-y-2">
-                  <li>
-                    <Link href="/support/contact" className="text-white/70 hover:text-palette-cream">
-                      Contact Us
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/support/shipping" className="text-white/70 hover:text-palette-cream">
-                      Shipping Info
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/support/returns" className="text-white/70 hover:text-palette-cream">
-                      Returns
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/support/faq" className="text-white/70 hover:text-palette-cream">
-                      FAQ
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+              {footerData.columns.map((column, columnIndex) => (
+                <div key={columnIndex}>
+                  <h3 className="font-bold text-lg mb-4">{column.title}</h3>
+                  <ul className="space-y-2">
+                    {column.links.map((link, linkIndex) => (
+                      <li key={linkIndex}>
+                        <Link href={link.url} className="text-white/70 hover:text-palette-cream">
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
 
               <div>
-                <h3 className="font-bold text-lg mb-4">Account</h3>
-                <ul className="space-y-2">
-                  <li>
-                    <Link href="/account" className="text-white/70 hover:text-palette-cream">
-                      My Account
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/account/orders" className="text-white/70 hover:text-palette-cream">
-                      Order History
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/wishlist" className="text-white/70 hover:text-palette-cream">
-                      Wishlist
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/account/personal-info" className="text-white/70 hover:text-palette-cream">
-                      Profile
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-lg mb-4">Download App</h3>
-                <p className="text-white/70 mb-4">Get our mobile app for a better experience</p>
+                <h3 className="font-bold text-lg mb-4">{footerData.downloadApp.title}</h3>
+                <p className="text-white/70 mb-4">{footerData.downloadApp.description}</p>
                 <div className="flex space-x-2">
-                  <Link href="#" className="block">
-                    <img
-                      src="/placeholder.svg?height=40&width=120&text=App+Store"
-                      alt="Download on App Store"
-                      className="h-10"
-                    />
-                  </Link>
-                  <Link href="#" className="block">
-                    <img
-                      src="/placeholder.svg?height=40&width=120&text=Google+Play"
-                      alt="Get it on Google Play"
-                      className="h-10"
-                    />
-                  </Link>
+                  {footerData.downloadApp.appStoreUrl && (
+                    <Link href={footerData.downloadApp.appStoreUrl} className="block">
+                      <img
+                        src="/placeholder.svg?height=40&width=120&text=App+Store"
+                        alt="Download on App Store"
+                        className="h-10"
+                      />
+                    </Link>
+                  )}
+                  {footerData.downloadApp.playStoreUrl && (
+                    <Link href={footerData.downloadApp.playStoreUrl} className="block">
+                      <img
+                        src="/placeholder.svg?height=40&width=120&text=Google+Play"
+                        alt="Get it on Google Play"
+                        className="h-10"
+                      />
+                    </Link>
+                  )}
                 </div>
-                <div className="mt-4">
-                  <img src="/placeholder.svg?height=100&width=100&text=QR+Code" alt="QR Code" className="h-24 w-24" />
-                </div>
+                {footerData.downloadApp.qrCode && (
+                  <div className="mt-4">
+                    <img src={footerData.downloadApp.qrCode} alt="QR Code" className="h-24 w-24" />
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -230,13 +229,7 @@ export function HomeFooter() {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="mt-8 pt-8 border-t border-white/20 flex flex-col md:flex-row justify-between items-center"
           >
-            <p className="text-white/70">
-              © 2023{" "}
-              <a href="/" onClick={handleLogoClick} className="hover:text-palette-cream cursor-pointer">
-                Kulshy O-Klashy
-              </a>
-              . All rights reserved.
-            </p>
+            <p className="text-white/70" dangerouslySetInnerHTML={{ __html: footerData.copyright }} />
             <div className="flex gap-4 mt-4 md:mt-0">
               {[1, 2, 3].map((_, index) => (
                 <motion.div
@@ -259,13 +252,7 @@ export function HomeFooter() {
           </motion.div>
         ) : (
           <div className="mt-8 pt-8 border-t border-white/20 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-white/70">
-              © 2023{" "}
-              <a href="/" onClick={handleLogoClick} className="hover:text-palette-cream cursor-pointer">
-                Kulshy O-Klashy
-              </a>
-              . All rights reserved.
-            </p>
+            <p className="text-white/70" dangerouslySetInnerHTML={{ __html: footerData.copyright }} />
             <div className="flex gap-4 mt-4 md:mt-0">
               {[1, 2, 3].map((_, index) => (
                 <Link key={index} href="#" className="text-white/70 hover:text-white">
