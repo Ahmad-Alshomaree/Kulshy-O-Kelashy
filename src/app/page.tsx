@@ -40,23 +40,50 @@ async function getProducts() {
   }
 }
 
+// Async function to fetch homepage sections
+async function getHomepageSections() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const response = await fetch(`${baseUrl}/api/homepage-sections`, {
+      cache: 'no-store'
+    })
+    
+    if (!response.ok) return []
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching homepage sections:', error)
+    return []
+  }
+}
+
 // Helper function to get top products based on a sort key
 function getTopProducts(products: any[], sortKey: string, limit = 4) {
   // Create a copy of the array, sort by the provided key in descending order, and take the top 'limit' items
   return [...products].sort((a, b) => b[sortKey] - a[sortKey]).slice(0, limit)
 }
 
+// Helper function to get products for a specific feature type
+function getProductsByFeatureType(products: any[], featureType: string, limit = 4) {
+  switch (featureType) {
+    case 'high-rated':
+      return getTopProducts(products, 'rating', limit)
+    case 'offers':
+      return getTopProducts(products.filter(p => p.isSale), 'rating', limit)
+    case 'most-viewed':
+      return getTopProducts(products, 'viewCount', limit)
+    case 'new-arrivals':
+      return getTopProducts(products.filter(p => p.isNew), 'createdAt', limit)
+    default:
+      return getTopProducts(products, 'rating', limit)
+  }
+}
+
 // Main Home page component - exported as default for Next.js page routing
 export default async function Home() {
-  // Fetch all products from the API
+  // Fetch all products and homepage sections from the API
   const allProducts = await getProducts()
-
-  // Get top 4 highest rated products
-  const highRatedProducts = getTopProducts(allProducts, 'rating')
-  // Get top 4 highest rated products that are on sale
-  const offerProducts = getTopProducts(allProducts.filter(p => p.isSale), 'rating')
-  // Get top 4 most viewed products
-  const mostViewedProducts = getTopProducts(allProducts, 'viewCount')
+  const homepageSections = await getHomepageSections()
 
   return (
     // Wrapper component for page transition animations
@@ -70,12 +97,20 @@ export default async function Home() {
         <main className="flex-1">
           {/* Hero section at the top of the page */}
           <HomeHero />
-          {/* First product section - High-Rated Items */}
-          <HomeProductSection title="High-Rated Items" products={highRatedProducts} featureType="high-rated" />
-          {/* Second product section - Offers with a slightly darker background */}
-          <HomeProductSection title="Offers" products={offerProducts} className="bg-muted/50" featureType="offers" />
-          {/* Third product section - Most Viewed */}
-          <HomeProductSection title="Most Viewed" products={mostViewedProducts} featureType="most-viewed" />
+          
+          {/* Dynamic homepage sections */}
+          {homepageSections.map((section: any, index: number) => {
+            const products = getProductsByFeatureType(allProducts, section.featureType)
+            return (
+              <HomeProductSection
+                key={section._id || index}
+                title={section.title}
+                products={products}
+                featureType={section.featureType}
+                className={section.backgroundColor || (index % 2 === 1 ? 'bg-muted/50' : '')}
+              />
+            )
+          })}
         </main>
 
         {/* Footer component at the bottom of the page */}
