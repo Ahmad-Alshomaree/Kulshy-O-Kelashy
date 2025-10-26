@@ -84,7 +84,7 @@ export function HomeHeader() {
                   transition={{ duration: 0.5, staggerChildren: 0.1 }}
                   className="inline-block"
                 >
-                  {"Kulshy O-Klashy".split("").map((char, index) => (
+                  {siteSettings.siteName.split("").map((char, index) => (
                     <motion.span
                       key={index}
                       initial={{ opacity: 0, y: 20 }}
