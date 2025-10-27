@@ -14,8 +14,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { generateMetadata as generateSeoMetadata, generateOrganizationSchema, siteConfig } from "@/lib/seo";
 import { StructuredData } from "@/components/structured-data";
 import { GoogleAnalytics } from "@/components/google-analytics";
-
-import VisualEditsMessenger from "../visual-edits/VisualEditsMessenger";
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = generateSeoMetadata({
@@ -60,8 +58,6 @@ export default function RootLayout({
         <Toaster />
         <Analytics />
         <SpeedInsights />
-      
-        <VisualEditsMessenger />
       </body>
     </html>
   )

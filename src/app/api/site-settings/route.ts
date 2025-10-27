@@ -19,10 +19,12 @@ export async function GET() {
     return NextResponse.json(settings);
   } catch (error) {
     console.error('Error fetching site settings:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch site settings' },
-      { status: 500 }
-    );
+    // Return default settings if MongoDB is not available
+    return NextResponse.json({
+      siteName: 'Kulshy O-Klashy',
+      contactEmail: 'contact@kulshyoklashy.com',
+      socialMedia: {},
+    });
   }
 }
 

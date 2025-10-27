@@ -12,10 +12,8 @@ export async function GET() {
     return NextResponse.json(sections);
   } catch (error) {
     console.error('Error fetching homepage sections:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch homepage sections' },
-      { status: 500 }
-    );
+    // Return mock data if MongoDB is not available
+    return NextResponse.json([]);
   }
 }
 

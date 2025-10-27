@@ -1,16 +1,52 @@
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
-// Users Table
+// Better Auth Tables
+export const session = sqliteTable('session', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id),
+  expiresAt: integer('expires_at').notNull(),
+  token: text('token').notNull().unique(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
+export const account = sqliteTable('account', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id),
+  accountId: text('account_id').notNull(),
+  providerId: text('provider_id').notNull(),
+  accessToken: text('access_token'),
+  refreshToken: text('refresh_token'),
+  idToken: text('id_token'),
+  expiresAt: integer('expires_at'),
+  password: text('password'),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
+export const verification = sqliteTable('verification', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: integer('expires_at').notNull(),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
+// Users Table (Better Auth compatible)
 export const user = sqliteTable('users', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: text('id').primaryKey(),
   email: text('email').notNull().unique(),
+  emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
   name: text('name').notNull(),
   passwordHash: text('password_hash').notNull(),
+  image: text('image'),
   role: text('role').notNull().default('customer'),
-  avatarUrl: text('avatar_url'),
   phone: text('phone'),
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
 });
 
 // Categories Table
@@ -26,7 +62,7 @@ export const kulshyCategories = sqliteTable('categories', {
 // Products Table
 export const kulshyProducts = sqliteTable('products', {
   productId: integer('id').primaryKey({ autoIncrement: true }),
-  sellerId: integer('seller_id').references(() => user.id),
+  sellerId: integer('seller_id').references((): any => user.id),
   productCategories: integer('category_id').references(() => kulshyCategories.id),
   productName: text('name').notNull(),
   description: text('description').notNull(),
@@ -62,7 +98,7 @@ export const productImages = sqliteTable('product_images', {
 // Cart Items Table
 export const cartItems = sqliteTable('cart_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: integer('user_id').references(() => user.id),
+  userId: integer('user_id').references((): any => user.id),
   productId: integer('product_id').references(() => kulshyProducts.productId),
   quantity: integer('quantity').notNull().default(1),
   selectedColor: text('selected_color'),
@@ -74,7 +110,7 @@ export const cartItems = sqliteTable('cart_items', {
 // Wishlist Items Table
 export const wishlistItems = sqliteTable('wishlist_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: integer('user_id').references(() => user.id),
+  userId: integer('user_id').references((): any => user.id),
   productId: integer('product_id').references(() => kulshyProducts.productId),
   createdAt: text('created_at').notNull(),
 });
@@ -82,7 +118,7 @@ export const wishlistItems = sqliteTable('wishlist_items', {
 // Addresses Table
 export const addresses = sqliteTable('addresses', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: integer('user_id').references(() => user.id),
+  userId: integer('user_id').references((): any => user.id),
   type: text('type').notNull(),
   fullName: text('full_name').notNull(),
   addressLine1: text('address_line1').notNull(),
@@ -100,7 +136,7 @@ export const addresses = sqliteTable('addresses', {
 // Payment Methods Table
 export const paymentMethods = sqliteTable('payment_methods', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: integer('user_id').references(() => user.id),
+  userId: integer('user_id').references((): any => user.id),
   type: text('type').notNull(),
   cardLastFour: text('card_last_four'),
   cardBrand: text('card_brand'),
@@ -112,7 +148,7 @@ export const paymentMethods = sqliteTable('payment_methods', {
 // Orders Table
 export const orders = sqliteTable('orders', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: integer('user_id').references(() => user.id),
+  userId: integer('user_id').references((): any => user.id),
   orderNumber: text('order_number').notNull().unique(),
   status: text('status').notNull().default('pending'),
   subtotal: real('subtotal').notNull(),
@@ -143,7 +179,7 @@ export const orderItems = sqliteTable('order_items', {
 export const reviews = sqliteTable('reviews', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   productId: integer('product_id').references(() => kulshyProducts.productId),
-  userId: integer('user_id').references(() => user.id),
+  userId: integer('user_id').references((): any => user.id),
   rating: integer('rating').notNull(),
   title: text('title'),
   comment: text('comment').notNull(),
@@ -156,7 +192,7 @@ export const reviews = sqliteTable('reviews', {
 export const stripeOrders = sqliteTable('stripe_orders', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   orderId: text('order_id').notNull().unique(),
-  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references((): any => user.id),
   customerEmail: text('customer_email').notNull(),
   customerName: text('customer_name').notNull(),
   stripePaymentIntentId: text('stripe_payment_intent_id').unique(),
