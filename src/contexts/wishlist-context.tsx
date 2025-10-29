@@ -33,7 +33,15 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 export function useWishlist() {
   const context = useContext(WishlistContext)
   if (context === undefined) {
-    throw new Error("useWishlist must be used within a WishlistProvider")
+    // Return a safe no-op implementation to avoid crashes when provider isn't mounted yet
+    return {
+      wishlistItems: [],
+      itemCount: 0,
+      isInWishlist: () => false,
+      addToWishlist: () => {},
+      removeFromWishlist: () => {},
+      clearWishlist: () => {},
+    }
   }
   return context
 }

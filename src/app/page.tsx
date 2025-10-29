@@ -52,7 +52,9 @@ async function getHomepageSections() {
     
     return await response.json()
   } catch (error) {
-    console.error('Error fetching homepage sections:', error)
+    if (process.env.NEXT_PUBLIC_DEBUG_CONTENT === 'true') {
+      console.error('Error fetching homepage sections:', error)
+    }
     return []
   }
 }

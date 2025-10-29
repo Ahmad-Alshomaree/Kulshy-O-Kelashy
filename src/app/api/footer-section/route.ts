@@ -16,7 +16,7 @@ export async function GET() {
     
     return NextResponse.json(footerSection);
   } catch (error) {
-    console.error('Error fetching footer section:', error);
+    if (process.env.MONGODB_URI) console.error('Error fetching footer section:', error);
     // Return mock data if MongoDB is not available
     return NextResponse.json({
       links: [

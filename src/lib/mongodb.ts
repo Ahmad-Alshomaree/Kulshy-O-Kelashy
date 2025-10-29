@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/kulshy-ecommerce';
+// Only enable MongoDB if an explicit URI is provided and not disabled
+const DISABLE_MONGODB = (process.env.DISABLE_MONGODB || '').toLowerCase() === 'true'
+const MONGODB_URI = process.env.MONGODB_URI
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env');
+if (DISABLE_MONGODB || !MONGODB_URI) {
+  // Fast-fail so API routes can return fallbacks immediately
+  throw new Error('MONGODB_DISABLED')
 }
 
 /**

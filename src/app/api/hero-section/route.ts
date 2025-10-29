@@ -18,7 +18,7 @@ export async function GET() {
     
     return NextResponse.json(heroSection);
   } catch (error) {
-    console.error('Error fetching hero section:', error);
+    if (process.env.MONGODB_URI) console.error('Error fetching hero section:', error);
     // Return mock data if MongoDB is not available
     return NextResponse.json({
       title: 'Sofa Eco Cula',

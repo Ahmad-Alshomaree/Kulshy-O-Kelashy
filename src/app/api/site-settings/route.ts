@@ -18,7 +18,7 @@ export async function GET() {
     
     return NextResponse.json(settings);
   } catch (error) {
-    console.error('Error fetching site settings:', error);
+    if (process.env.MONGODB_URI) console.error('Error fetching site settings:', error);
     // Return default settings if MongoDB is not available
     return NextResponse.json({
       siteName: 'Kulshy O-Klashy',

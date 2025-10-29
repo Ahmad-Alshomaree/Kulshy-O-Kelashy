@@ -11,7 +11,7 @@ export async function GET() {
     
     return NextResponse.json(sections);
   } catch (error) {
-    console.error('Error fetching homepage sections:', error);
+    if (process.env.MONGODB_URI) console.error('Error fetching homepage sections:', error);
     // Return mock data if MongoDB is not available
     return NextResponse.json([]);
   }

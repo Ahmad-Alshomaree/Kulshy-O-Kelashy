@@ -1,3 +1,4 @@
+"use client"
 import { PageTransitionWrapper } from "@/components/page-transition-wrapper"
 import { HomeHeader } from "@/components/home-header"
 import { HomeFooter } from "@/components/home-footer"
