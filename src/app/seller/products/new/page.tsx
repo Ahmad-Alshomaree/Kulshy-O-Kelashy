@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
-import { ImageUpload } from "@/components/seller/image-upload"
+// import { ImageUpload } from "@/components/seller/image-upload"
 
 export default function NewProduct() {
   const router = useRouter()
@@ -231,7 +231,7 @@ export default function NewProduct() {
                 <CardDescription>Upload images of your product. You can add up to 5 images.</CardDescription>
               </CardHeader>
               <CardContent>
-                <ImageUpload />
+                {/* <ImageUpload /> */}
               </CardContent>
             </Card>
           </TabsContent>

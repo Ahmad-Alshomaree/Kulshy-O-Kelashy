@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import { db } from '@/db';
 import { stripeOrders, kulshyProducts } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { logError, logger } from '@/lib/logger';
+import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 
 // Edge runtime for low latency
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err) {
       const error = err as Error;
-      logError(error, { context: 'Webhook signature verification' });
+      logger.error('Webhook signature verification failed', { error: error.message });
       return NextResponse.json(
         { error: `Webhook signature verification failed: ${error.message}` },
         { status: 400 }
@@ -88,9 +88,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    logError(error instanceof Error ? error : new Error(String(error)), {
-      context: 'Stripe webhook handler',
-    });
+    logger.error('Stripe webhook handler failed', { error: error instanceof Error ? error.message : String(error) });
     
     if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
       Sentry.captureException(error);
@@ -182,10 +180,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       amount: session.amount_total,
     });
   } catch (error) {
-    logError(error instanceof Error ? error : new Error(String(error)), {
-      context: 'handleCheckoutSessionCompleted',
-      sessionId: session.id,
-    });
+    logger.error('handleCheckoutSessionCompleted failed', { error: error instanceof Error ? error.message : String(error), sessionId: session.id });
     throw error;
   }
 }
@@ -207,10 +202,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
       amount: paymentIntent.amount,
     });
   } catch (error) {
-    logError(error instanceof Error ? error : new Error(String(error)), {
-      context: 'handlePaymentIntentSucceeded',
-      paymentIntentId: paymentIntent.id,
-    });
+    logger.error('handlePaymentIntentSucceeded failed', { error: error instanceof Error ? error.message : String(error), paymentIntentId: paymentIntent.id });
     throw error;
   }
 }
@@ -233,10 +225,7 @@ async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
       lastPaymentError: paymentIntent.last_payment_error?.message,
     });
   } catch (error) {
-    logError(error instanceof Error ? error : new Error(String(error)), {
-      context: 'handlePaymentIntentFailed',
-      paymentIntentId: paymentIntent.id,
-    });
+    logger.error('handlePaymentIntentFailed failed', { error: error instanceof Error ? error.message : String(error), paymentIntentId: paymentIntent.id });
     throw error;
   }
 }
@@ -258,10 +247,7 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
       amount: charge.amount_refunded,
     });
   } catch (error) {
-    logError(error instanceof Error ? error : new Error(String(error)), {
-      context: 'handleChargeRefunded',
-      chargeId: charge.id,
-    });
+    logger.error('handleChargeRefunded failed', { error: error instanceof Error ? error.message : String(error), chargeId: charge.id });
     throw error;
   }
 }

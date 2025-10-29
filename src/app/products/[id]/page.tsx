@@ -52,7 +52,13 @@ const getProductById = (id: string) => {
   }
 }
 
-export default function ProductPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function ProductPage({ params }: PageProps) {
   const product = getProductById(params.id)
   const [mainImage, setMainImage] = useState(product.images[0])
   const [selectedColor, setSelectedColor] = useState(product.colors[0])

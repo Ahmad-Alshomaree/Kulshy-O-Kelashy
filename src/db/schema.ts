@@ -49,6 +49,17 @@ export const user = sqliteTable('users', {
   updatedAt: text('updated_at').notNull(),
 });
 
+// User Preferences Table
+export const userPreferences = sqliteTable('user_preferences', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull().references(() => user.id),
+  language: text('language').notNull().default('en'),
+  theme: text('theme').notNull().default('light'),
+  twoFactorEnabled: integer('two_factor_enabled', { mode: 'boolean' }).notNull().default(false),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
 // Categories Table
 export const kulshyCategories = sqliteTable('categories', {
   id: integer('id').primaryKey({ autoIncrement: true }),
